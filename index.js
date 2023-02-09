@@ -5,7 +5,7 @@ const { createCanvas, loadImage } = require('canvas')
 var colors = require('colors/safe');
 var ui = new inquirer.ui.BottomBar();
 
-var boardsize = [30000,30000]
+var boardsize = [20000,20000]
 
 const canvas = createCanvas(boardsize[0], boardsize[1])
 const ctx = canvas.getContext('2d', {quality:'best',patternQuality:'best'})
@@ -14,6 +14,9 @@ const out = fs.createWriteStream('./test.png')
 const stream = canvas.createPNGStream({quality:'best',patternQuality:'best'})
 stream.pipe(out)
 out.on('finish', () =>  console.log('The PNG file was created.'))
+
+var resultantvectorx = 0;
+var resultantvectory = 0;
 
 	ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.fillRect(0, 0, boardsize[0], boardsize[1]);
@@ -81,7 +84,6 @@ for(let i = 1; i < 1001; i++){
 	else if(vectorx > 0 && vectory > 0){quadrent = 1; ctx.strokeStyle = 'rgba(255,50,0,1)'}
 	
 	ctx.lineWidth = 20
-	
 	ctx.beginPath()
 	ctx.moveTo(boardsize[0]/2, boardsize[1]/2)
 	ctx.lineTo(vectorx + boardsize[0]/2, vectory + boardsize[1]/2)
@@ -89,5 +91,19 @@ for(let i = 1; i < 1001; i++){
 	canvas_arrow(ctx, boardsize[0]/2, boardsize[1]/2, vectorx + boardsize[0]/2, vectory + boardsize[1]/2, 25);
 	ctx.stroke()
 	
-	console.log(`Vector X : ${vectorx}\nVector Y : ${vectory}\nQuadrent : ${quadrent}\nAngle : ${angle} / ${quadrent*90 - 90 + angle}\nPositionX : ${vectorx + boardsize[0]/2}\nPositionY : ${vectory +  + boardsize[1]/2}\n`)
+	resultantvectorx = resultantvectorx + vectorx;
+	resultantvectory = resultantvectory + vectory;
+	console.log(`> Vector ${i} <\nVector X : ${vectorx}N\nVector Y : ${vectory}N\nQuadrent : ${quadrent}\nResultant : ${Math.floor(Math.sqrt(vectory*vectory + vectorx*vectorx))}N\nAngle : ${angle}' | ${quadrent*90 - 90 + angle}'(360)\nPositionX : ${vectorx + boardsize[0]/2}\nPositionY : ${vectory +  + boardsize[1]/2}\n`)
 }
+
+ctx.strokeStyle = 'rgba(234,0,255,1)'
+ctx.lineWidth = 70
+ctx.beginPath()
+ctx.moveTo(boardsize[0]/2, boardsize[1]/2)
+ctx.lineTo(resultantvectorx + boardsize[0]/2, resultantvectory + boardsize[1]/2)
+ctx.stroke()
+canvas_arrow(ctx, boardsize[0]/2, boardsize[1]/2, resultantvectorx + boardsize[0]/2, resultantvectory + boardsize[1]/2, 100);
+ctx.stroke()
+
+console.log(`> RESULTANT VECTOR <\nVector X : ${resultantvectorx}N\nVector Y : ${resultantvectory}N\nQuadrent : 000\nResultant : ${Math.floor(Math.sqrt(resultantvectory*resultantvectory + resultantvectorx*resultantvectorx))}N\nAngle : 000' | 000'(360)\n`)
+console.log("Saving Image To PNG...")
